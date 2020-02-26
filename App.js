@@ -7,10 +7,32 @@
     var input = document.getElementById("add_input");
     var table = document.getElementById("my_table");
     var radio = document.getElementsByName("sort");
+
+
+
+      //POST 
+      $(document).ready(function(){
+        $("#add_btn").bind("click", function(){
+          console.log(input.value);
+            $.ajax({
+              url: 'http://localhost:3000',
+              method: 'post',
+              dataType: 'html',
+              data: {message: input.value},
+              success: function(data){
+                alert(data);
+                input.value = "";  
+              }
+            });
+        });
+      });
+
 // добавление новой записи
       button.addEventListener("click", function(){
       var row = document.createElement("tr"); 
+      //Server();
       if (input.value != ""){     
+       
         table.appendChild(row);
         var td1 = document.createElement("td");
         var td2 = document.createElement("td");
@@ -27,6 +49,7 @@
         row.appendChild(td3);
         row.appendChild(td4);
 
+     
 
         //перед добавлением смотрим, как нужно отсортировать новую запись
         for (var i=0;i<radio.length; i++) {
@@ -35,7 +58,8 @@
             break;
           }
       }
-        input.value = "";   
+
+        
 
         //удаление записи
         td4.addEventListener("click", function(){
@@ -95,7 +119,6 @@ for (var i=0;i<radio.length; i++) {
 
 function sort(type_sorted){
 
-  
   if (this.value == "asc_num" || type_sorted.value == "asc_num") {
   let sortedRows = Array.from(table.rows)
   .slice(1)
@@ -128,5 +151,33 @@ function sort(type_sorted){
    
 }
   
+/*
+function Server(){
+  var ajax = new XMLHttpRequest();
 
+  var params = new FormData();
+  params.append("lang", "JavaScript");
+  params.append("framework", "jQuery");
+
+
+  // выполнить код, когда придёт ответ с POST-запроса
+  ajax.onreadystatechange = function() {
+      if (ajax.readyState == 4) {
+  
+          if (ajax.status == 200 || ajax.status == 304) {
+              // код при успешном запросе
+              ajax.response; // ответ сервера
+          } else {
+              // код при ошибке
+          }
+  
+      }
+  }
+  
+  // Оправка POST-запроса
+  ajax.open('POST', 'http://localhost:3000');
+  ajax.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+  ajax.send(params);
+}
+*/
 
