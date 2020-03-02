@@ -1,183 +1,172 @@
+var input = document.getElementById("add_input");
+var table = document.getElementById("my_table");
+var radio = document.getElementsByName("sort");
+
+
+//при первом выводе таблицы, проверяем, как нужно отсортировать
+for (var i=0;i<radio.length; i++) {
+  if (radio[i].checked){
+    PrintTable(radio[i].value);
+    break;
+  }
+}
+
+
+ //прверка был ли изменен тип сортировки
+ for (var i=0;i<radio.length; i++) {
+  radio[i].onchange = sort;
+}
+function sort(){
+ PrintTable(this.value);
+}
 
 
 
- var index = 0; // порядковый номер записи
 
-    var button = document.getElementById("add_btn");
-    var input = document.getElementById("add_input");
-    var table = document.getElementById("my_table");
-    var radio = document.getElementsByName("sort");
+//клик по кнопке удалить, для удаления строки записи
+$("#my_table").on("click", ".delete_button", function(e) {  
+  id_delete = $(this).parent().siblings(":first").text();
+  //var value=$(this).closest('tr').children('td:first').text();
+  Delete(id_delete);
 
-
-
-      //POST 
-      $(document).ready(function(){
-        $("#add_btn").bind("click", function(){
-          console.log(input.value);
-            $.ajax({
-              url: 'http://localhost:3000',
-              method: 'post',
-              dataType: 'html',
-              data: {message: input.value},
-              success: function(data){
-                alert(data);
-                input.value = "";  
-              }
-            });
-        });
-      });
-
-// добавление новой записи
-      button.addEventListener("click", function(){
-      var row = document.createElement("tr"); 
-      //Server();
-      if (input.value != ""){     
-       
-        table.appendChild(row);
-        var td1 = document.createElement("td");
-        var td2 = document.createElement("td");
-        var td3 = document.createElement("button");
-        var td4 = document.createElement("button");
-
-        td1.innerHTML = ++index;
-        td2.innerHTML = input.value;
-        td3.textContent = "Udate"
-        td4.textContent = "Delete";
-          
-        row.appendChild(td1);
-        row.appendChild(td2);
-        row.appendChild(td3);
-        row.appendChild(td4);
-
-     
-
-        //перед добавлением смотрим, как нужно отсортировать новую запись
-        for (var i=0;i<radio.length; i++) {
-          if (radio[i].checked){
-            sort(radio[i].value);
-            break;
-          }
-      }
-
-        
-
-        //удаление записи
-        td4.addEventListener("click", function(){
-            this.parentNode.remove();            
-        });
-
-
-        //редактирование записи
-        td3.addEventListener("click", function(){
-          var update = document.createElement("input");
-          var ok = document.createElement("button");
-          var cancel = document.createElement("button");
-          ok.textContent = "Ok";
-          cancel.textContent = "Cancel";
-          this.parentNode.innerHTML= "";
-          update.value = td2.textContent;        
-          row.appendChild(td1);
-          row.appendChild(update);
-          row.appendChild(ok);
-          row.appendChild(cancel);
-
-          ok.addEventListener("click", function(){  
-              this.parentNode.innerHTML= "";            
-              td2.innerHTML = update.value;
-              row.appendChild(td1);
-              row.appendChild(td2);
-              row.appendChild(td3);
-              row.appendChild(td4);              
-          });
-
-          cancel.addEventListener("click", function(){
-            this.parentNode.innerHTML= "";            
-            td2.innerHTML = td2.textContent;
-            row.appendChild(td1);
-            row.appendChild(td2);
-            row.appendChild(td3);
-            row.appendChild(td4); 
-          });
-
-
-        });
-
-      
-
-
-        
-      }//if 
-
+  for (var i=0;i<radio.length; i++) {
+    if (radio[i].checked){
+      PrintTable(radio[i].value);
+      break;
+    }
+  }
 });
 
 
 
-//проверяем был ли изменен тип сортировки
-for (var i=0;i<radio.length; i++) {
-        radio[i].onchange = sort;
+var id_update = "";
+//id для update
+$("#my_table").on("click", "tr", function(e) {
+  id_update = (($(e.currentTarget).find('td:first').text() ));
+  //console.log(id_update);
+});
+
+
+function PrintTable(sort_type){
+ $.ajax({
+    url: 'http://localhost:3000/' + sort_type,
+    method: 'get',
+    dataType: 'html',     
+    success: function(data){       
+       $("#my_table").html(data);  
     }
-
-function sort(type_sorted){
-
-  if (this.value == "asc_num" || type_sorted.value == "asc_num") {
-  let sortedRows = Array.from(table.rows)
-  .slice(1)
-  .sort((rowA, rowB) => (Number)(rowA.cells[0].innerHTML) > (Number)(rowB.cells[0].innerHTML) ? 1 : -1);
-
-   table.tBodies[0].append(...sortedRows);
-  }
-  else if (this.value == "desc_num" || type_sorted == "desc_num"){
-    let sortedRows = Array.from(table.rows)
-  .slice(1)
-  .sort((rowA, rowB) => (Number)(rowA.cells[0].innerHTML) < (Number)(rowB.cells[0].innerHTML) ? 1 : -1);
-   table.tBodies[0].append(...sortedRows);
-  }
-
-  else if (this.value == "asc_alp" || type_sorted == "asc_alp"){
-    let sortedRows = Array.from(table.rows)
-  .slice(1)
-  .sort((rowA, rowB) => rowA.cells[1].innerHTML > rowB.cells[1].innerHTML ? 1 : -1);
-
-   table.tBodies[0].append(...sortedRows);
-  }
-
-  else if (this.value == "desc_alp" || type_sorted == "desc_alp"){
-    let sortedRows = Array.from(table.rows)
-  .slice(1)
-  .sort((rowA, rowB) => rowA.cells[1].innerHTML < rowB.cells[1].innerHTML ? 1 : -1);
-
-   table.tBodies[0].append(...sortedRows);
-  }
-   
+ });
 }
-  
-/*
-function Server(){
-  var ajax = new XMLHttpRequest();
 
-  var params = new FormData();
-  params.append("lang", "JavaScript");
-  params.append("framework", "jQuery");
-
-
-  // выполнить код, когда придёт ответ с POST-запроса
-  ajax.onreadystatechange = function() {
-      if (ajax.readyState == 4) {
-  
-          if (ajax.status == 200 || ajax.status == 304) {
-              // код при успешном запросе
-              ajax.response; // ответ сервера
-          } else {
-              // код при ошибке
-          }
-  
+function Update(edit_massage){
+    $.ajax({
+      url: 'http://localhost:3000/' + id_update,
+      method: 'post',
+      dataType: 'json',
+      data: {edit: edit_massage},
+      success: function(data){
+        console.log(data);                         
       }
-  }
-  
-  // Оправка POST-запроса
-  ajax.open('POST', 'http://localhost:3000');
-  ajax.setRequestHeader("X-Requested-With", "XMLHttpRequest");
-  ajax.send(params);
+    });                
 }
-*/
 
+function Delete(id_delete){
+    $.ajax({
+      url: 'http://localhost:3000/delete/' + id_delete,
+      method: 'post',
+      dataType: 'json',
+      success: function(data){
+        console.log(data);                         
+      }
+    });                
+}
+
+$(document).ready(function(){ 
+ //добавление записи
+   $("#add_btn").bind("click", function(){
+     if (input.value != "") //если строка ввода не пустая, то добавляем запись
+    $.ajax({
+      url: 'http://localhost:3000',
+      method: 'post',
+      dataType: 'json',
+      data: {message: input.value},
+      success: function(data){
+      console.log(data);  
+      input.value = "";  
+      }
+      });
+      //провереям тип сортировки, чтобы правильно втсавить новую запись
+      for (var i=0;i<radio.length; i++) {
+        if (radio[i].checked){
+          PrintTable(radio[i].value);
+          break;
+        }
+      }
+      PrintTable(radio[i].value);
+        });    
+
+      });
+
+
+
+
+let editingTd;
+
+//редактировние при клике на запись
+table.onclick = function(event) {
+  // 3 возможных цели
+  let target = event.target.closest('.edit-cancel,.edit-ok,td');
+
+  if (!table.contains(target)) return;
+
+  if (event.target.className == 'delete_button') return; //игнорируем нажатие на кнопку "Delete"
+  if (event.target.className == 'id') return; //игнорируем нажатие на № 
+  
+  if (target.className == 'edit-cancel' ) {
+    finishTdEdit(editingTd.elem, false);
+  } else if (target.className == 'edit-ok') {
+    finishTdEdit(editingTd.elem, true);
+  } else if (target.nodeName == 'TD') {
+    if (editingTd) return; // уже редактируется
+
+    makeTdEditable(target);
+  }
+
+};
+
+function makeTdEditable(td) {
+  editingTd = {
+    elem: td,
+    data: td.innerHTML
+  };
+
+  let textArea = document.createElement('textarea');
+  textArea.style.width = td.clientWidth + 'px';
+  textArea.style.height = td.clientHeight + 'px';
+  textArea.className = 'edit-area';
+
+  textArea.value = td.innerHTML;
+  td.innerHTML = '';
+  td.appendChild(textArea);
+  textArea.focus();
+
+  td.insertAdjacentHTML("beforeEnd",
+    '<div class="edit-controls"><button class="edit-ok">OK</button><button class="edit-cancel">CANCEL</button></div>'
+  );
+}
+
+function finishTdEdit(td, isOk) {
+  if (isOk) {
+    td.innerHTML = td.firstChild.value;
+    Update(td.innerHTML);
+  } else {
+    td.innerHTML = editingTd.data;
+  }
+   editingTd = null;
+}
+
+
+
+
+
+  

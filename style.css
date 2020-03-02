@@ -1,12 +1,6 @@
-button{
-    border: 2px solid grey;
-    padding: 8px;
-    font-size: 18px
-}
 
 table{
-    margin: auto;
-    
+    margin: auto;  
 }
 
 
@@ -15,7 +9,7 @@ input{
 }
 
 ul{
-    font-size: 18px;
+    font-size: 10px;
     list-style-type: none; 
     text-align: center;
 }
